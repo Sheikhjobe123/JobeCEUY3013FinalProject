@@ -14,22 +14,23 @@ print('Your products are : ' + products)
 print(reactants)
 print(products)
 
-def elemList (reOrProd):
+finRe = []
+finProd = []
+
+def elemList (reOrProd):    #takes the reactants or products and gives back a list of reactants/products
     lst = []
     i = 0
     st = ''
     while i < len(reOrProd):
         if reOrProd[i].isalnum():
             st += reOrProd[i]
-            print(st)
         if reOrProd[i]== '+' or i == (len(reOrProd)-1):
-            print ('APPEND!')
             lst.append(st)
             st = ''
         i+=1
     return lst
 
-def elems (reOrProd):
+def elems (reOrProd):                #also takes reactants or products and gives back a dictionary of reactants/products and number of atoms
     dic = {}
     i = 0
     st = ''
@@ -64,52 +65,116 @@ then using common denominators/numerators find the whole number needed to multip
 a balanced equation
 """
 
-def balanceHelper(reDict, prodDict, key):
+def balanceHelper(reDict, prodDict, key):        #function with two functions in it to help balance equation
     print("HELPER CALLED")
     #reList
     #prodList
     s = ''
-    print ('pd + rd')
-    print (prodDict[key])
-    print(reDict[key])
+    #print ('pd + rd')
+    #print (prodDict[key])
+    #print(reDict[key])
 # 2 Na + 2 HCl ->  2 NaCl + 1 H2
 #Na + HCl -> NaCl + H2 
 # {'Na': 2, 'H': 2, 'Cl': 2}
-#{'Na': 2, 'Cl': 2, 'H': 2}
-    if prodDict[key] > reDict[key]:
+# {'Na': 2, 'Cl': 2, 'H': 2}
+    def bigProd(reDict, prodDict, key):                    #helper function to ensure the chosen element (key) has the same number of atoms in reactants and products
         for x in range(len(reList)):
             if key in reList[x]:
-                s = str(prodDict[key]/reDict[key]) + reList[x] #figure out where s goes in reList
+                l= []
+                k = ''
+                for i in reList[x]:
+                    if i.isalpha():
+                        k+=i
+                    else:
+                        l.append(k)
+                        k = ''
+                print(l)
+                print(reDict)
+                print(key)
+                print(reDict[key])
+                s = str(prodDict[key]/reDict[key]) + reList[x]
+                finRe.append(s)
+                 #figure out where s goes in reList
                 print(s) # 2* no of H
-                for elem in reList[x]: 
+                for elem in l: 
                     if elem in reDict:
-                        reDict[elem] = (prodDict[elem]/reDict[elem])
-                        print('re')
-                        print(elem)
-                        print(reDict[elem])
-                        #break
+                        mul = int(prodDict[elem]/reDict[elem])
+                        for item in l:
+                            print('mul:')
+                            print(mul)
+                            if item in reDict:
+                                reDict[item] = mul * reDict[item]
+                                print('re')
+                                print(item)
+                                print(reDict[item])
+                        break
         
-    elif prodDict[key] < reDict[key]:
+    def bigRe(reDict, prodDict, key):                  #same as bigProd but when no of atoms in reactants > no of atoms in products
         for x in range(len(prodList)):
             if key in prodList[x]:
-                s = str(reDict[key]/prodDict[key])+prodList[x] #figure out where s goes in prodList
+                l= []
+                k = ''
+                for i in prodList[x]:
+                    if i.isalpha():
+                        k+=i
+                    else:
+                        l.append(k)
+                        k = ''
+                #print(l)
+                print(prodDict)
+                print(reDict)
+                #print(key)
+                #print(prodDict[key])
+            #if key in prodList[x]:
+                s = str(reDict[key]/prodDict[key])+prodList[x] 
+                finProd.append(s)
                 print(s)
-                for elem in prodList[x] :
-                    if elem in prodDict:
-                        prodDict[elem] = (reDict[elem]/prodDict[elem])
-                        print('pr')
-                        print(elem)
+                for elem in l :
+                    if elem in prodDict: #HERE
+                        print("LOOK HERE")
+                        print(reDict[elem])
                         print(prodDict[elem])
-                        #break
+                        mul = int(reDict[elem]/prodDict[elem])
+                        for item in l:
+                            print(item)
+
+                            print('mul:')
+                            print(mul)
+                            if item in prodDict:
+                                prodDict[item] = mul * prodDict[item]#int(reDict[elem]/prodDict[elem])
+                                print('pr')
+                                print(item)
+                                print(prodDict[item])
+                        break
+        
+
+    if prodDict[key] > reDict[key]:                  #calls bigProd or bigRe depending on which side has more atoms of the element
+        print('callin bigProd')
+        print(reDict, prodDict, key)
+        bigProd(reDict, prodDict, key)
+        print( 'after bigProd')
+        print(reDict, prodDict, key)
+        if prodDict[key] < reDict[key]:
+            bigRe(reDict, prodDict, key)
+
+    if prodDict[key] < reDict[key]:
+        print('callin bigRe')
+        print(reDict, prodDict, key)
+        bigRe(reDict, prodDict, key)
+        print('after bigRe')
+        print(reDict, prodDict, key)
+        if prodDict[key] > reDict[key]:
+            bigProd(reDict, prodDict, key)
+
  
-def balance(reDict, prodDict):
+def balance(reDict, prodDict):                       #first checks if equation is already balanced, if not balanced it calls the balance helper function to balance it
     balanced = False
     rkeys = sorted(list(reDict.keys()))
     pkeys = sorted(list(prodDict.keys()))
     r = sorted(list(reDict.items()))
     p = sorted(list(prodDict.items()))
-    print(rkeys)
-    print(pkeys)
+    #print(rkeys)
+    #print(pkeys)
     if rkeys != pkeys:
         print('You did not input the correct reactants/products. Please try again')
         return -1
@@ -117,41 +182,28 @@ def balance(reDict, prodDict):
         print('balanced')
         balanced = True
         return 0
-    else:
-        """
+    else:                             
+        
         for key in reDict:
         #while balanced == False:
             if reDict[key] != prodDict[key]:
+                print(reDict, prodDict, key)
                 balanceHelper(reDict, prodDict, key)
-        """
-        keys = list(reDict.keys())
-        print('keys:')
-        print(keys)
-        i = 0
-        key = keys[i]
-        while balanced == False and (i < len(keys)):
-            print('ke')
-            print(key)
-            balanceHelper(reDict, prodDict, key)
-            if reDict[key] == prodDict[key]:
-                key = keys[i]
-            else:
-                i +=1
+         
                 #key = keys[i]
 
 
-#balance(reDict, prodDict)
+balance(reDict, prodDict)
 print('after: ')
 print(reDict)
 print(prodDict)
 
 
-#figure out a way to keep calling balance helper till eqn is balanced
-#deal with floating pt stuff
-
 print('Your balanced reactants are: ')
+print(finRe)
 print('Your balanced products are: ')
 print(reList)
 print(prodList)
-            
-
+print(finProd)
+#Final Output:            
+#2Na + 2HCL -> 2NaCl + H2
